@@ -1,0 +1,26 @@
+[Unit]
+Description=Start Minecraft
+After=network.target
+#service runs after connection to internet 
+
+[Service]
+User=linux_user 
+#user may need to be root depending on how server is setup
+
+WorkingDirectory=/home/linux_user/Minecraft_Servers/java_server
+
+#run with screen so that way we can still access the active shell even though it is running as a service
+
+ExecStart=screen -DmS "java_server" java -Xmx8192M -Xms2048M -jar server.jar nogui
+ExecStop=screen -DmS -p 0 -S "java_server" -X eval 'stuff "say SERVER GOING OFFLINE IN 15 SECONDS..."\015'
+ExecStop=/bin/sleep 5
+ExecStop=screen -DmS -p 0 -S "java_server" -X eval 'stuff "say SERVER GOING OFFLINE IN 10 SECONDS..."\015'
+ExecStop=/bin/sleep 5
+ExecStop=screen -DmS -p 0 -S "java_server" -X eval 'stuff "say SERVER GOING OFFLINE IN 5 SECONDS..."\015'
+ExecStop=/bin/sleep 5
+ExecStop=screen -DmS -p 0 -S "java_server" -X eval 'stuff "save-all"\015'
+ExecStop=screen -DmS -p 0 -S "java_server" -X eval 'stuff "stop"\015'
+#ensure that the server is shutdown properly and that the world is saved
+
+[Install]
+WantedBy=default.target
